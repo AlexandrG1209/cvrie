@@ -1,15 +1,15 @@
-# CVRIE — Images et témoignages
+# CVRIE Images et témoignages
 
 Classer les radiographies avec kNN et RandomForest. Regrouper les témoignages avec TF-IDF et KMeans.
 
 ```mermaid
 flowchart TD
-    A[CSV + PNG] --> B[Catégories 0/1 et division train 80 % / validation 20 %]
+    A[CSV + PNG] --> B[Catégories 0/1 et division train 80% / validation 20%]
     B --> C[Tailles 128, 256, 512 et pixels sur une ligne]
     C --> D[kNN et RandomForest]
     D --> E[Comparer les résultats et sauvegarder les modèles]
     E --> F[Dashboard Streamlit]
-    G[Témoignages CSV] --> H[TF-IDF puis KMeans : 7 groupes]
+    G[Témoignages CSV] --> H[TF-IDF puis KMeans: 7 groupes]
     H --> I[Sauvegarder TF-IDF, KMeans et les groupes]
     I --> F
 ```
@@ -18,7 +18,7 @@ Télécharger les images sur [Kaggle](https://www.kaggle.com/datasets/ibombonato
 
 ## Lancer
 
-Depuis la racine du projet, sur macOS/Linux :
+Depuis la racine du projet, sur macOS/Linux:
 
 ```bash
 python3 -m venv .venv
@@ -27,9 +27,9 @@ python -m pip install -r requirements.txt
 python -m jupyterlab
 ```
 
-Exécuter `Supervised_Learning/Image_Analysis.ipynb` pour sauvegarder les modèles dans `models/supervised/`. Pour les textes, le notebook `Unsupervised_Learning/Cluster.ipynb` présente l’analyse ; le script ci-dessous sauvegarde le modèle.
+Exécuter `Supervised_Learning/Image_Analysis.ipynb` pour sauvegarder les modèles dans `models/supervised/`. Pour les textes, le notebook `Unsupervised_Learning/Cluster.ipynb` présente l’analyse, le script ci-dessous sauvegarde le modèle.
 
-Dans un autre terminal, avec le même environnement :
+Dans un autre terminal, avec le même environnement:
 
 ```bash
 python Unsupervised_Learning/Unsupervised_Learning.py
