@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import joblib
+
 from Clustering import (
     compute_silhouette,
     create_clusters,
@@ -7,7 +11,8 @@ from Clustering import (
 from Dataset import load_dataset
 from Preprocessing import vectorize
 
-df = load_dataset("Student_Dataset.csv")
+df = load_dataset("Unsupervised_Learning/Student_Dataset.csv")
+Path("models/unsupervised").mkdir(parents=True, exist_ok=True)
 
 X, vectorizer = vectorize(df["text"])
 
@@ -18,3 +23,7 @@ model, labels = create_clusters(X, 7)
 print_cluster_keywords(model, vectorizer)
 
 print_cluster_examples(df, labels)
+
+# Sauvegarder le modèle et les groupes pour le dashboard.
+joblib.dump({"vectorizer": vectorizer, "model": model}, "models/unsupervised/text_model.joblib")
+df.assign(cluster=labels).to_csv("models/unsupervised/patients.csv", index=False)

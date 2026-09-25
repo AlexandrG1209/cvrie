@@ -6,8 +6,9 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-ROOT = Path(__file__).parent
-MODELS_DIR = ROOT / 'models'
+ROOT = Path(__file__).resolve().parent
+MODELS_DIR = ROOT / 'models/supervised'
+TEXT_MODELS_DIR = ROOT / 'models/unsupervised'
 CATEGORIES = [
     'Abdomen', 'Cheville', 'Colonne cervicale', 'Thorax', 'Clavicules',
     'Coude', 'Pieds', 'Doigt', 'Avant-bras', 'Main', 'Hanche', 'Genou',
@@ -28,35 +29,73 @@ def prepare_image(image, size):
     return square
 
 
-st.set_page_config(page_title='CVRIE — Radiographies')
-st.title('Radiographies')
+st.set_page_config(page_title='CVRIE')
+part = st.radio('Partie', ['Radiographies', 'Témoignages'], horizontal=True)
 
-if not (MODELS_DIR / 'validation.csv').is_file():
-    st.info('Exécutez le notebook pour enregistrer les modèles et la liste des images de validation.')
-    st.stop()
+if part == 'Radiographies':
+    st.title('Radiographies')
 
-validation = pd.read_csv(MODELS_DIR / 'validation.csv')
-index = st.selectbox('Image de validation', validation.index, format_func=lambda i: f'Image {i + 1}')
-size = st.selectbox('Taille', [128, 256, 512])
-name = st.selectbox('Modèle', ['kNN', 'RandomForest'])
-row = validation.iloc[index]
+    source = st.radio('Images', ['Validation', 'Test'], horizontal=True)
+    if source == 'Validation':
+        if not (MODELS_DIR / 'validation.csv').is_file():
+            st.info('Exécutez le notebook pour enregistrer les modèles et la liste des images de validation.')
+            st.stop()
+        validation = pd.read_csv(MODELS_DIR / 'validation.csv')
+        image_paths = [ROOT / 'archive-2/images/train' / f'{uid}-c.png' for uid in validation['SOPInstanceUID']]
+    else:
+        image_paths = sorted((ROOT / 'archive-2/images/test').glob('*.png'))
+        st.caption('Test : les catégories réelles ne sont pas disponibles.')
 
-try:
-    image = plt.imread(ROOT / 'archive-2/images/train' / f"{row['SOPInstanceUID']}-c.png")
-except FileNotFoundError:
-    st.error('Téléchargez les images dans archive-2/images/train/.')
-    st.stop()
-prepared = prepare_image(image, size)
-st.image(prepared, caption=f'{size} × {size}', width=300)
-st.write('Catégories attendues : ' + ', '.join(CATEGORIES[int(code)] for code in row['Target'].split()))
-
-if st.button('Prédire', type='primary'):
-    model_path = MODELS_DIR / f'{name}_{size}.joblib'
-    if not model_path.is_file():
-        st.error('Exécutez le notebook pour enregistrer ce modèle.')
+    if not image_paths:
+        st.info('Aucune image disponible. Pour le test, placez les PNG dans archive-2/images/test/.')
         st.stop()
-    with st.spinner('Prédiction…'):
-        model = joblib.load(model_path, mmap_mode='r')
-        prediction = model.predict(prepared.reshape(1, -1))[0]
-    categories = ', '.join(CATEGORIES[code] for code in np.flatnonzero(prediction))
-    st.write('Prédiction : ' + (categories or 'Aucune catégorie'))
+
+    index = st.selectbox('Image', range(len(image_paths)), format_func=lambda i: f'Image {i + 1}', key=source)
+    size = st.selectbox('Taille', [128, 256, 512])
+    name = st.selectbox('Modèle', ['kNN', 'RandomForest'])
+    try:
+        image = plt.imread(image_paths[index])
+    except FileNotFoundError:
+        st.error(f'Image introuvable : {image_paths[index].name}')
+        st.stop()
+    prepared = prepare_image(image, size)
+    st.image(prepared, caption=f'{size} × {size}', width=300)
+    if source == 'Validation':
+        target = str(validation.iloc[index]['Target'])
+        st.write('Catégories attendues : ' + ', '.join(CATEGORIES[int(code)] for code in target.split()))
+
+    if st.button('Prédire', type='primary'):
+        model_path = MODELS_DIR / f'{name}_{size}.joblib'
+        if not model_path.is_file():
+            st.error('Exécutez le notebook pour enregistrer ce modèle.')
+            st.stop()
+        with st.spinner('Prédiction…'):
+            model = joblib.load(model_path, mmap_mode='r')
+            prediction = model.predict(prepared.reshape(1, -1))[0]
+        categories = ', '.join(CATEGORIES[code] for code in np.flatnonzero(prediction))
+        st.write('Prédiction : ' + (categories or 'Aucune catégorie'))
+
+else:
+    st.title('Témoignages des patients')
+    model_path = TEXT_MODELS_DIR / 'text_model.joblib'
+    patients_path = TEXT_MODELS_DIR / 'patients.csv'
+    if not model_path.is_file() or not patients_path.is_file():
+        st.info('Lancez : python Unsupervised_Learning/Unsupervised_Learning.py')
+        st.stop()
+
+    saved = joblib.load(model_path)
+    vectorizer = saved['vectorizer']
+    model = saved['model']
+    patients = pd.read_csv(patients_path)
+
+    group = st.selectbox('Groupe', range(model.n_clusters))
+    st.dataframe(patients.loc[patients['cluster'] == group, ['id', 'text']], hide_index=True)
+
+    text = st.text_area('Nouveau témoignage (en anglais)')
+    if st.button('Trouver le groupe', disabled=not text.strip()):
+        vector = vectorizer.transform([text])
+        if vector.nnz == 0:
+            st.info('Aucun mot reconnu. Ajoutez une description plus précise.')
+        else:
+            predicted_group = int(model.predict(vector)[0])
+            st.write(f'Groupe proposé : {predicted_group}')
