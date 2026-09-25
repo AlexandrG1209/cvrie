@@ -38,4 +38,6 @@ python -m streamlit run app.py
 
 Choisir **Radiographies** ou **Témoignages**. Le dashboard charge les fichiers enregistrés, sans refaire le train. TF-IDF, KMeans et les groupes sont sauvegardés dans `models/unsupervised/` par le script des textes.
 
-Pour les images : **Validation** affiche les catégories réelles et la prédiction ; **Test** affiche seulement la prédiction.
+Pour les images: 
+**Validation** affiche les catégories réelles et la prédiction
+**Test** affiche seulement la prédiction.
