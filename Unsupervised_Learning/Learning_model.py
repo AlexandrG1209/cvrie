@@ -1,6 +1,7 @@
 from Clustering import (
     compute_silhouette,
     create_clusters,
+    get_cluster_names,
     print_cluster_examples,
     print_cluster_keywords,
 )
@@ -11,10 +12,10 @@ df = load_dataset("Student_Dataset.csv")
 
 X, vectorizer = vectorize(df["text"])
 
-scores = compute_silhouette(X)
-
 model, labels = create_clusters(X, 7)
+
+cluster_names = get_cluster_names(model, vectorizer)
 
 print_cluster_keywords(model, vectorizer)
 
-print_cluster_examples(df, labels)
+print_cluster_examples(df, labels, cluster_names)
