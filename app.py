@@ -80,7 +80,7 @@ else:
     model_path = TEXT_MODELS_DIR / 'text_model.joblib'
     patients_path = TEXT_MODELS_DIR / 'patients.csv'
     if not model_path.is_file() or not patients_path.is_file():
-        st.info('Lancez : python Unsupervised_Learning/Unsupervised_Learning.py')
+        st.info('Lancez : python Unsupervised_Learning/Learning_model.py')
         st.stop()
 
     saved = joblib.load(model_path)

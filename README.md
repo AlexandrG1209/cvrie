@@ -27,12 +27,12 @@ python -m pip install -r requirements.txt
 python -m jupyterlab
 ```
 
-Exécuter `Supervised_Learning/Image_Analysis.ipynb` pour sauvegarder les modèles dans `models/supervised/`. Pour les textes, le notebook `Unsupervised_Learning/Cluster.ipynb` présente l’analyse, le script ci-dessous sauvegarde le modèle.
+Exécuter `Supervised_Learning/Image_Analysis.ipynb` pour sauvegarder les modèles dans `models/supervised/`. Pour les textes, le notebook `Unsupervised_Learning/Unsupervised_Learning.ipynb` présente l’analyse, le script ci-dessous sauvegarde le modèle.
 
 Dans un autre terminal, avec le même environnement:
 
 ```bash
-python Unsupervised_Learning/Unsupervised_Learning.py
+python Unsupervised_Learning/Learning_model.py
 python -m streamlit run app.py
 ```
 
