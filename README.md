@@ -111,5 +111,5 @@ python -m streamlit run app.py
 
 ## Contributors
 
-- **Alexandr Gorlachev** — [@AlexandrG1209](https://github.com/AlexandrG1209)
-- **Benoit Leroy** — [@NoctifishE](https://github.com/NoctifishE)
+- **Alexandr Gorlachev** (Supervised Learning — Multi-Label X-Ray Image Classification) — [@AlexandrG1209](https://github.com/AlexandrG1209)
+- **Benoit Leroy** (Unsupervised Learning — Patient Testimony Clustering) — [@NoctifishE](https://github.com/NoctifishE)
