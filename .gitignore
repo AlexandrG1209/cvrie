@@ -1,6 +1,10 @@
 /.DS_Store
 /.venv/
+/venv/
 /.cache/
+/__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
 /archive-2/
 /data/cleaned/
 /models/
